@@ -97,7 +97,7 @@
 
 .btn-zero{
   flex: 2;
-  align-items: end;
+  align-items: flex-end;
   display: flex;
   padding-left: 30px;
 }

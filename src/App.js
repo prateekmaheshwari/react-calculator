@@ -1,48 +1,78 @@
 import React from "react";
-import { connect } from "react-redux";
-import { calculate, deleteLastEntry, clear, evaluateExpression } from "./store/actions/calculate";
 import Screen from "./components/Screen";
 import Keypad from "./components/Keypad";
-import * as fromCalculator from "./store";
 import "./App.css";
 
-export class App extends React.Component {
-  
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      expression: '',
+      total: 0,
+      dotCounter: 0
+    }
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick = key => {
+    switch (key) {
+      case "C":
+        this.clear();
+        break;
+      case "DEL":
+        this.delete();
+        break;
+      case "=":
+        this.evaluate();
+        break;
+      default:
+        this.setExpression(key);
+        break;
+    }
+  };
+
+  clear() {
+    this.setState({ expression: '', total: 0 });
+  }
+
+  delete() {
+    let expression = this.state.expression;
+    expression = expression.split('').slice(0, expression.length - 1).join('');
+    this.setState({ expression });
+  }
+
+  evaluate() {
+    let total = eval(this.state.expression);
+    this.setState({ total });
+  }
+
+  setExpression(key) {
+    let val = this.state.expression;
+    if (val === '' && (key === '+' || key === '*' || key === '/')) {
+      return;
+    }
+    if(isNaN(key)){
+      this.setState({ dotCounter: 0 });
+    }
+    if (key === '.') {
+      if (this.state.dotCounter > 0) {
+        return;
+      }
+      this.setState({ dotCounter: this.state.dotCounter + 1 });
+    }
+    val += key;
+    this.setState({ expression: val });
+  }
+
   render() {
     return (
       <div className="calculator-container">
-        <Screen {...this.props} />
-        <Keypad {...this.props} />
+        <Screen expression={this.state.expression} total={this.state.total} />
+        <Keypad handleClick={this.handleClick} />
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    expression: fromCalculator.getExpression(state),
-    total: fromCalculator.getTotal(state)
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    calculate: buttonKey => {
-      dispatch(calculate(buttonKey));
-    },
-    delete: () => {
-      dispatch(deleteLastEntry());
-    },
-    clear: () => {
-      dispatch(clear());
-    },
-    evaluate: () => {
-      dispatch(evaluateExpression());
-    }
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App);
