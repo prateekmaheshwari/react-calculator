@@ -1,5 +1,5 @@
 # About
-This is a simple calculator app built using ReactJs and Redux.
+This is a simple calculator app built using ReactJs.
 
 # Pre-requisites
 You need to have Node and NPM installed on your system.
